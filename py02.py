@@ -1,15 +1,18 @@
 #Python面向对象基础
 class MyClass:  #类名遵循大驼峰命名法（见名知义），符合标识符规定
+    """这是一个示例类，为后文的各种类或实例的特性服务"""
     height=800  #类属性：类所拥有的属性，既可以使用类名，也可以使用self调用；类似C++类的静态成员变量
     __hide='隐藏属性'
     _private='私有属性'
     @staticmethod   #静态方法既可以用类名访问，也可以用对象名访问
     def show():
+        """定义静态方法"""
         print("staticmethod静态方法")
         print(f"我的高度为：{MyClass.height}")    #可以访问类属性，但是没有意义
         # self.width=100  #不能访问对象的实例成员
     @classmethod    #类方法，方法内部可以访问类属性，或者调用其它类方法
     def ClassMethod(cls):   #参数列表第一个参数则是类本身（名字不一定是cls）
+        """定义类方法"""
         print(cls)
         print("classmethod类方法")
         # self.width=100  #不能访问对象的实例成员
@@ -24,17 +27,25 @@ class MyClass:  #类名遵循大驼峰命名法（见名知义），符合标识
         self.name='洗衣机'
         self.age=10
         self.width=200      #实例属性，对象私有
+    def __str__(self):  #__str__()没有返回或者返回的不是字符串则报错
+        return "这里是__str__()的返回值"
+        # return 1
+        # pass
+    def __call__(self):
+        print("这是__call__()方法")
     def __hidefun(self):        #隐藏方法，可以通过公有方法调用
-        print("这是隐藏方法")
+        """定义隐藏方法"""
+        print("这是隐藏方法__hidefun()")
         # self.name='123'     #可以成功修改公有成员
     def wash(self): #self参数名并不是硬性规定，可以是其他的名称
+        """定义公有实例方法"""
         print("我会洗衣服")
         print("wash()成员方法里的self地址：",self)
     def introduce(self):        #公有实例方法
         #如果使用类名调用类属性，则用对象无法成功修改该属性
         print(f"{self.name}的高度：{MyClass.height}，年龄：{self.age}，属性：{MyClass.__hide}")
         # MyClass.__hidefun(self) #通过introduce()公有方法调用__hidefun()隐藏方法
-    def __del__(self):
+    def __del__(self):      #析构函数，程序结束/删除某个对象时都会调用
         print("这是__del__()方法")
 
 #1.查看类属性：类名.属性名
@@ -199,9 +210,35 @@ MyClass.show()
 print(MyClass)      #cls参数即为当前类
 MyClass.ClassMethod()
 
-#14.魔术方法
+#14.魔术属性/方法
 #(1)__new__()：由object基类提供的内置静态方法，不能被重写，不然会导致创建对象错误
 #<1>在内存中为对象分配空间
 #<2>返回对象的引用，然后对象才能调用__init__()
 
 #(2)__init__()：实例级别的方法，初始化对象，定义实例属性
+
+#(3)__doc__：类或方法的描述信息，只能使用多行注释""""""
+print(MyClass.__doc__)
+print(MyClass.ClassMethod.__doc__)
+print(MyClass.show.__doc__)
+print(MyClass.wash.__doc__)
+
+#(4)__module__：表示当前操作对象所在模块；__class__：表示当前操作对象所在类
+import test2
+b=test2.B()
+print(b.__module__)
+print(b.__class__)
+
+#(5)__str__()：对象的描述信息，打印对象时默认输出该方法的返回值，也就是打印方法中返回的数据
+#该方法必须返回一个字符串
+mc=MyClass('456',1)
+print(mc)
+
+#(6)__call__()：使一个实例对象成为一个可调用对象，就像函数那样可调用
+#可调用对象：（内置）函数和类都是可调用对象，凡是可以把一对()应用到某个对象身上的均可称为可调用对象
+#callable()：判断一个对象是否是可调用对象
+print(callable(MyClass))
+print(callable(MyClass.ClassMethod))
+mc=MyClass('456',1)
+print(callable(mc))     #MyClass类中重写__call__()方法后返回True
+mc()    #调用一个可调用的实例对象，其实就是在调用它的__call__()方法
