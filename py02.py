@@ -31,6 +31,15 @@ class MyClass:  #类名遵循大驼峰命名法（见名知义），符合标识
         return "这里是__str__()的返回值"
         # return 1
         # pass
+    def __repr__(self): #__repr__()可以返回任意值或者对象
+        return "这里是__repr__()的返回值"
+        # return 1
+    def __getitem__(self,item):
+        print("这是__getitem__()方法")
+    def __setitem__(self,key,value):
+        print("这是__setitem__()方法")
+    def __delitem__(self,key):
+        print("这是__delitem__()方法")
     def __call__(self):
         print("这是__call__()方法")
     def __hidefun(self):        #隐藏方法，可以通过公有方法调用
@@ -229,10 +238,12 @@ b=test2.B()
 print(b.__module__)
 print(b.__class__)
 
-#(5)__str__()：对象的描述信息，打印对象时默认输出该方法的返回值，也就是打印方法中返回的数据
+#(5)__str__()：对象的描述信息，打印对象时默认输出该方法的返回值，也就是打印方法中返回的数据，给用户看的
+#__repr__()：输出给程序员Debug使用
 #该方法必须返回一个字符串
 mc=MyClass('456',1)
-print(mc)
+print(mc)       #默认调用__repr__()
+print(mc.__repr__())    #MyClass类同时定义__str__()和__repr__()，则应该显式调用__repr__()
 
 #(6)__call__()：使一个实例对象成为一个可调用对象，就像函数那样可调用
 #可调用对象：（内置）函数和类都是可调用对象，凡是可以把一对()应用到某个对象身上的均可称为可调用对象
@@ -242,3 +253,19 @@ print(callable(MyClass.ClassMethod))
 mc=MyClass('456',1)
 print(callable(mc))     #MyClass类中重写__call__()方法后返回True
 mc()    #调用一个可调用的实例对象，其实就是在调用它的__call__()方法
+
+#(7)__dict__()：查看类/对象中的所有属性，方法
+#dir()与__dict__()的区别：dir返回一个对象的所有属性和方法，包括__dict__()返回的属性和方法
+# __dict__()返回一个字典，并不是所有对象都拥有的属性，许多内建类型并没有
+print(MyClass.__dict__)
+print(mc.__dict__)
+print(MyClass.__dict__)
+
+#(8)__getitem__()、__setitem__()、__delitem__()
+mc=MyClass('456',1)
+#赋值操作，也即获取
+res=mc['name']      #自动触发执行__getitem__()
+#修改
+mc['name']='zs'     #自动触发执行__setitem__()
+#删除
+del mc['name']      #自动触发执行__delitem__()
