@@ -25,7 +25,7 @@
 '''
     我是多行注释
 '''
-from idlelib.grep import findfiles
+# from idlelib.grep import findfiles    #从idlelib.grep包中引入模块findfiles
 
 """
     我也是多行注释
