@@ -1156,9 +1156,12 @@ te.funa()
 from test import funa as a,test_name,funb as b
 
 #内置全局变量__name__：用来控制py文件在不同的应用场景执行不同的逻辑
-#if __name__=="__main__":
 #(1)文件在当前程序执行（即自己执行自己）__name__=="__main__"
 #(2)文件当作模块被其他文件导入__name__=="模块名"
+
+# 代码主程序入口：__name__=="__main__"；
+# (1)防止别人导入文件的时候执行main里面的方法
+# (2)防止Windows系统递归创建子进程
 import test
 test.test()
 

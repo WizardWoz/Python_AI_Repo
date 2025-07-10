@@ -1,4 +1,4 @@
-# 1.多线程：同时运行多个线程
+# 1.多线程：同时运行多个线程（适合IO密集型操作：文件操作、爬虫）
 # 进程：操作系统进行资源分配的基本单位，每打开一个程序至少有一个进程
 # 线程：CPU调度的基本单位，每个进程至少有一个线程，该线程即为主线程；一个进程默认拥有一个线程，且可以创建多个线程，线程是依附于进程的
 # 需要先导入线程模块import threading
@@ -25,7 +25,7 @@ def task():
 # 3.线程之间共享资源；进程间不共享全局变量
 li=['张三','李四','王五','赵六']   # 定义全局变量li
 # 为li写入数据的方法
-def wdata(q1):
+def wdata():
     for i in range(5):
         li.append(i)
         time.sleep(1)
@@ -69,6 +69,7 @@ def add2():
     lock.release()
 
 # 6.进程：操作系统进行资源分配的基本单位，一个正在运行的程序/软件就是一个进程；多进程也可实现多任务
+# 多进程适合CPU密集型操作（例：科学计算、视频高清解码）
 # 进程的状态：
 # (1)就绪状态：运行条件均满足，等待被CPU调度执行
 # (2)运行状态：CPU正在执行
@@ -115,6 +116,61 @@ print(q.empty())
 print(q.get())
 print(q.empty())
 print(q.qsize())
+
+# 8.协程（微线程/纤程）：Python中实现多任务的方式，比线程更小、占用资源更少；自带CPU上下文，协程切换过程中要保存/恢复
+# 是在单线程下的开发；线程&进程的操作是由程序触发系统接口，最后的执行者是系统；协程的操作则是由程序员触发
+# 应用场景：一个线程内部IO操作较多；适合高并发处理
+# 以下是协程的简单实现
+def task1():
+    while True:
+        yield 'a'
+        time.sleep(1)
+def task2():
+    while True:
+        yield 'b'
+        time.sleep(1)
+
+# 9.greenlet模块：为更好使用协程完成多任务。Python中的greenlet模块对其封装，使切换任务更加简单
+# 由C语言实现的协程模块；通过设置switch()来实现任意函数之间的切换
+# 注意：greenlet属于手动切换，当遇到IO操作程序会阻塞，而不能进行自动切换
+from greenlet import greenlet
+def sing1():
+    print("sing1在唱歌")
+    g2.switch()
+    print("sing1唱完歌了")
+def dance1():
+    print("dance1在跳舞")
+    print("dance1跳完舞了")
+    g1.switch()
+
+# 10.gevent：当遇到IO操作程序会自动切换，属于主动切换，相较于greenlet更好；但是底层实现仍基于greenlet
+import gevent       # 导入gevent模块
+# gevent.spawn(函数名)    # 创建协程对象
+# gevent.sleep()      # 睡眠操作
+# gevent.join()：     # 阻塞，等待某个协程执行结束
+# gevent.joinall()：  # 等待所有协程对象都执行结束再退出，参数是一个协程对象列表
+def sing2():
+    print("sing2在唱歌")
+    gevent.sleep(3)
+    print("sing2唱完歌了")
+def dance2():
+    print("dance2在跳舞")
+    gevent.sleep(2)
+    print("dance2跳完舞了")
+
+def sing3(name):
+    for i in range(3):
+        gevent.sleep(1)     # 注意，不能使用time.sleep()
+        print(f"{name}在唱歌")
+    
+# 11.monkey补丁：拥有在模块运行时替换的功能
+from gevent import monkey
+# monkey.patch_all()必须放在被打补丁的函数前
+monkey.patch_all()      # 将用到的time.sleep(1)替换为gevent.sleep(1)
+def sing4(name):
+    for i in range(3):
+        time.sleep(1)     # 注意，不能使用time.sleep()
+        print(f"{name}在唱歌")
 
 # Thread线程类参数：
 # (1)target：执行的任务名
@@ -199,3 +255,28 @@ if __name__=="__main__":
     # 开启子进程
     p3.start()      # 写进程已经将新数据写入共享数组了
     p4.start()      # 可读进程的读取共享数组一直是空的
+
+    # 创建协程方法一：手动实现
+    # t1=task1()
+    # t2=task2()
+    # while True:
+    #     print(next(t1))
+    #     print(next(t2))
+    # 创建协程方法二：greenlet模块
+    g1=greenlet(sing1)
+    g2=greenlet(dance1)
+    g1.switch()     # 切换到g1中去运行
+    g2.switch()     # 切换到g2中去运行
+    # 创建协程方法三：gevent模块
+    g3=gevent.spawn(sing2)
+    g4=gevent.spawn(dance2)
+    g3.join()       # 主线程要先等待g3协程对象执行结束后才结束
+    g4.join()       # 主线程要先等待g4协程对象执行结束后才结束
+    gevent.joinall([    # 主线程等待所有协程对象执行完才退出
+        gevent.spawn(sing3,'bingbing'),
+        gevent.spawn(sing3,'冰冰')
+    ])
+    gevent.joinall([    # 主线程等待所有协程对象执行完才退出
+        gevent.spawn(sing4,'我'),
+        gevent.spawn(sing4,'你')
+    ])
