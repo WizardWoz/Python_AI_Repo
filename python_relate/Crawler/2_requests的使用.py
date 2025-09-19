@@ -38,3 +38,4 @@ print(response.request.headers)
 print(response.headers)
 #推测的响应内容编码格式
 print(response.apparent_encoding)
+print(len(response.content.decode()))   #响应内容的长度是2349
