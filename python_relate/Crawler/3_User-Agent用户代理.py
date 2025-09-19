@@ -1,5 +1,5 @@
 import requests
-# 5.用户代理：请求头中user-agent字段必不可少，表示客户端操作系统以及浏览器信息
+# 1.用户代理：请求头中user-agent字段必不可少，表示客户端操作系统以及浏览器信息
 url="https://www.baidu.com"
 # (1)构建请求头，添加User-Agent的目的是为了让服务器认为是浏览器在发送请求，而不是爬虫程序发送请求
 headers={
