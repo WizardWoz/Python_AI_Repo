@@ -22,6 +22,10 @@ print(response.text)
 # (2)分析登录请求，找到url、请求方式、请求参数
 # (3)确定登录才能访问的页面url和请求方法
 # (4)利用requests.session()模拟登录
+data={
+    'email':'你的账号',
+    'password':'你的密码'
+}
 session=requests.session()
 response=session.post(url,data=data,headers=headers)
 session.get(url.text)
